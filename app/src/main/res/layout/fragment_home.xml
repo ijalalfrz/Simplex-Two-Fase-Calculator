@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/margin"
+    tools:context=".Fragment.HomeFragment">
+
+    <LinearLayout
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:visibility="gone"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/margin"
+            android:id="@+id/warning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            style="@style/LabelForm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jumlah Variabel" />
+        <EditText
+            android:theme="@style/EditTextTheme"
+            android:id="@+id/num_var"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"/>
+
+
+        <TextView
+            android:layout_marginTop="@dimen/padding"
+            style="@style/LabelForm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jumlah Constraint" />
+        <EditText
+            android:theme="@style/EditTextTheme"
+            android:id="@+id/num_cons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"/>
+
+        <Button
+            android:id="@+id/btn_max"
+            android:foreground="?android:selectableItemBackground"
+            style="?android:borderlessButtonStyle"
+            android:text="MAXIMIZE"
+            android:textColor="#FFFFFF"
+            android:background="#466289"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btn_min"
+            android:foreground="?android:selectableItemBackground"
+            style="?android:borderlessButtonStyle"
+            android:text="MINIMIZE"
+            android:textColor="#FFFFFF"
+            android:background="#627894"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</RelativeLayout>
