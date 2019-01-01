@@ -111,9 +111,15 @@ public class HasilActivity extends AppCompatActivity {
     public void count(){
         tableFase1.removeAllViews();
 
-        Simplex.Modeler model = new Simplex.Modeler(constraintLeftSide, constraintRightSide,constraintOperator, objectiveFunction);
+        double[] Rprog= findR();
+        for (int i =0; i<objectiveFunction.length;i++){
+            objectiveFunction[i] = Rprog[i];
+        }
+        double Rval = Rprog[Rprog.length-1];
 
-        Simplex simplex = new Simplex(model.getTableaux(),model.getNumberOfConstraint(),model.getNumberOfOriginalVariable(), MAXIMIZE, fase1Wrapper, getApplicationContext());
+        Simplex.Modeler model = new Simplex.Modeler(constraintLeftSide, constraintRightSide,constraintOperator, objectiveFunction,Rval);
+
+        Simplex simplex = new Simplex(model.getTableaux(),model.getNumberOfConstraint(),model.getNumberOfOriginalVariable(), MAXIMIZE, fase1Wrapper, getApplicationContext(), 1);
         double[] x = simplex.primal();
         for (int i = 0; i < x.length; i++){
 
@@ -121,5 +127,26 @@ public class HasilActivity extends AppCompatActivity {
         }
 
         System.out.println("Solution: " + simplex.value());
+    }
+
+    public double[] findR(){
+        double[] objectiveFunctionWithValue;
+        objectiveFunctionWithValue = new double[bahan.variable.size()+1];
+
+        ArrayList<Integer> indexHasR = new ArrayList<>();
+        for (int i=0; i<constraintOperator.length;i++){
+            if(constraintOperator[i].equals(HitungActivity.Constraint.equal) || constraintOperator[i].equals(HitungActivity.Constraint.greatherThan)){
+                indexHasR.add(i);
+            }
+        }
+
+        for (int i:indexHasR) {
+            for(int j=0;j<bahan.variable.size();j++){
+                objectiveFunctionWithValue[j] += constraintLeftSide[i][j];
+            }
+            objectiveFunctionWithValue[objectiveFunctionWithValue.length-1] += constraintRightSide[i];
+        }
+
+        return  objectiveFunctionWithValue;
     }
 }

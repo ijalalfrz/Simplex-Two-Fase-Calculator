@@ -28,10 +28,11 @@ public class Simplex {
     public static final boolean MINIMIZE = false;
     private Context ctx;
     private LinearLayout wrapper;
+    private int fase;
 
     private int[] basis; // basis[i] = basic variable corresponding to row i
 
-    public Simplex(double[][] tableaux, int numberOfConstraint, int numberOfOriginalVariable, boolean maximizeOrMinimize, LinearLayout wrapper, Context ctx) {
+    public Simplex(double[][] tableaux, int numberOfConstraint, int numberOfOriginalVariable, boolean maximizeOrMinimize, LinearLayout wrapper, Context ctx, int fase) {
         this.maximizeOrMinimize = maximizeOrMinimize;
         this.numberOfConstraints = numberOfConstraint;
         this.numberOfOriginalVariables = numberOfOriginalVariable;
@@ -42,6 +43,7 @@ public class Simplex {
             basis[i] = numberOfOriginalVariables + i;
         this.ctx = ctx;
         this.wrapper = wrapper;
+        this.fase = fase;
         solve();
 
     }
@@ -203,6 +205,9 @@ public class Simplex {
         table.addView(trHead);
 
 
+        if(tableaux[numberOfConstraints][numberOfConstraints + numberOfOriginalVariables]<0&&fase==1){
+            return;
+        }
         for (int i = 0; i <= numberOfConstraints; i++) {
             TableRow tr = new TableRow(ctx);
             tr.setPadding(0,0,0,0);
@@ -243,9 +248,9 @@ public class Simplex {
         HitungActivity.Constraint[] constraintOperator = { HitungActivity.Constraint.lessThan, HitungActivity.Constraint.lessThan, HitungActivity.Constraint.lessThan};
         double[] constraintRightSide = { 12, 8, 8 };
 
-        Modeler model = new Modeler(constraintLeftSide, constraintRightSide,constraintOperator, objectiveFunc);
+        Modeler model = new Modeler(constraintLeftSide, constraintRightSide,constraintOperator, objectiveFunc,0);
 
-        Simplex simplex = new Simplex(model.getTableaux(), model.getNumberOfConstraint(), model.getNumberOfOriginalVariable(), MAXIMIZE,null,null);
+        Simplex simplex = new Simplex(model.getTableaux(), model.getNumberOfConstraint(), model.getNumberOfOriginalVariable(), MAXIMIZE,null,null,1);
         double[] x = simplex.primal();
         for (int i = 0; i < x.length; i++)
             System.out.println("x[" + i + "] = " + x[i]);
@@ -258,10 +263,8 @@ public class Simplex {
         private double[][] a; // tableaux
         private int numberOfConstraints; // number of constraints
         private int numberOfOriginalVariables; // number of original variables
+        public Modeler(double[][] constraintLeftSide, double[] constraintRightSide, HitungActivity.Constraint[] constraintOperator, double[] objectiveFunction, double objectiveValues) {
 
-        public Modeler(double[][] constraintLeftSide,
-                       double[] constraintRightSide, HitungActivity.Constraint[] constraintOperator,
-                       double[] objectiveFunction) {
             numberOfConstraints = constraintRightSide.length;
             numberOfOriginalVariables = objectiveFunction.length;
             a = new double[numberOfConstraints + 1][numberOfOriginalVariables + numberOfConstraints + 1];
@@ -292,8 +295,10 @@ public class Simplex {
             }
 
             // initialize objective function
-            for (int j = 0; j < numberOfOriginalVariables; j++)
+            for (int j = 0; j < numberOfOriginalVariables; j++){
                 a[numberOfConstraints][j] = objectiveFunction[j];
+            }
+            a[numberOfConstraints][numberOfOriginalVariables + numberOfConstraints] = objectiveValues;
         }
 
         public double[][] getTableaux() {
