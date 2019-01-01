@@ -1,9 +1,18 @@
 package rizalalfarizi1600807.cs.upi.edu.simplextwofase.Util;
 
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.design.widget.TabLayout;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import rizalalfarizi1600807.cs.upi.edu.simplextwofase.HitungActivity;
 
@@ -17,12 +26,12 @@ public class Simplex {
 
     public static final boolean MAXIMIZE = true;
     public static final boolean MINIMIZE = false;
-    private TableLayout parent;
+    private Context ctx;
+    private LinearLayout wrapper;
 
     private int[] basis; // basis[i] = basic variable corresponding to row i
 
-    public Simplex(double[][] tableaux, int numberOfConstraint,
-                   int numberOfOriginalVariable, boolean maximizeOrMinimize, TableLayout v) {
+    public Simplex(double[][] tableaux, int numberOfConstraint, int numberOfOriginalVariable, boolean maximizeOrMinimize, LinearLayout wrapper, Context ctx) {
         this.maximizeOrMinimize = maximizeOrMinimize;
         this.numberOfConstraints = numberOfConstraint;
         this.numberOfOriginalVariables = numberOfOriginalVariable;
@@ -31,7 +40,8 @@ public class Simplex {
         basis = new int[numberOfConstraints];
         for (int i = 0; i < numberOfConstraints; i++)
             basis[i] = numberOfOriginalVariables + i;
-        parent = v;
+        this.ctx = ctx;
+        this.wrapper = wrapper;
         solve();
 
     }
@@ -144,14 +154,73 @@ public class Simplex {
 
     // print tableaux
     public void show() {
+        Resources r = ctx.getResources();
+        int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,20,r.getDisplayMetrics());
+
         System.out.println("M = " + numberOfConstraints);
         System.out.println("N = " + numberOfOriginalVariables);
+
+        TableLayout.LayoutParams trParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+
+        TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+        tableParams.setMargins(0,px,0,0);
+
+
+        TableLayout table = new TableLayout(ctx);
+        table.setStretchAllColumns(true);
+        table.setLayoutParams(tableParams);
+
+        //TABLE HEAD
+        TableRow trHead = new TableRow(ctx);
+        trHead.setPadding(0,0,0,0);
+        trHead.setLayoutParams(trParams);
+        for (int i = 1; i <= numberOfOriginalVariables; i++){
+            TextView th = new TextView(ctx);
+            th.setTypeface(Typeface.DEFAULT_BOLD);
+            th.setTextColor(Color.rgb(0,0,0));
+            th.setText("x"+i);
+            th.setGravity(Gravity.CENTER);
+            trHead.addView(th);
+        }
+
+        for (int i = 1; i <= numberOfConstraints; i++){
+            TextView th = new TextView(ctx);
+            th.setTypeface(Typeface.DEFAULT_BOLD);
+            th.setTextColor(Color.rgb(250, 97, 33));
+            th.setText("s"+i);
+            th.setGravity(Gravity.CENTER);
+            trHead.addView(th);
+        }
+
+        TextView th = new TextView(ctx);
+        th.setTypeface(Typeface.DEFAULT_BOLD);
+        th.setTextColor(Color.rgb(70, 98, 137));
+        th.setText("Nilai");
+        th.setGravity(Gravity.CENTER);
+        trHead.addView(th);
+
+        trHead.setLayoutParams(trParams);
+        table.addView(trHead);
+
+
         for (int i = 0; i <= numberOfConstraints; i++) {
+            TableRow tr = new TableRow(ctx);
+            tr.setPadding(0,0,0,0);
+            tr.setLayoutParams(trParams);
+
             for (int j = 0; j <= numberOfConstraints + numberOfOriginalVariables; j++) {
                 System.out.printf("%7.2f ", tableaux[i][j]);
+                TextView tv = new TextView(ctx);
+                tv.setText(String.format("%7.2f",tableaux[i][j]));
+                tv.setTextColor(Color.rgb(0,0,0));
+                tr.addView(tv);
             }
+            table.addView(tr, trParams);
             System.out.println();
         }
+
+        wrapper.addView(table);
+
         System.out.println("value = " + value());
         for (int i = 0; i < numberOfConstraints; i++)
             if (basis[i] < numberOfOriginalVariables)
@@ -171,16 +240,12 @@ public class Simplex {
         double[][] constraintLeftSide = {
 
                 { 4, 3 }, { 4, 1 }, { 4, -1} };
-        HitungActivity.Constraint[] constraintOperator = { HitungActivity.Constraint.lessThan,
-                HitungActivity.Constraint.lessThan, HitungActivity.Constraint.lessThan};
+        HitungActivity.Constraint[] constraintOperator = { HitungActivity.Constraint.lessThan, HitungActivity.Constraint.lessThan, HitungActivity.Constraint.lessThan};
         double[] constraintRightSide = { 12, 8, 8 };
 
-        Modeler model = new Modeler(constraintLeftSide, constraintRightSide,
-                constraintOperator, objectiveFunc);
+        Modeler model = new Modeler(constraintLeftSide, constraintRightSide,constraintOperator, objectiveFunc);
 
-        Simplex simplex = new Simplex(model.getTableaux(),
-                model.getNumberOfConstraint(),
-                model.getNumberOfOriginalVariable(), MAXIMIZE,null);
+        Simplex simplex = new Simplex(model.getTableaux(), model.getNumberOfConstraint(), model.getNumberOfOriginalVariable(), MAXIMIZE,null,null);
         double[] x = simplex.primal();
         for (int i = 0; i < x.length; i++)
             System.out.println("x[" + i + "] = " + x[i]);

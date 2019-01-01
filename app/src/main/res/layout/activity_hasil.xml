@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content">
 
                 <LinearLayout
-
+                    android:id="@+id/fase1_wrapper"
                     android:padding="@dimen/padding"
                     android:orientation="vertical"
                     android:layout_width="match_parent"

@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
 
@@ -20,6 +21,7 @@ public class HasilActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CalcWrapper bahan;
     private TableLayout tableFase1;
+    private LinearLayout fase1Wrapper;
 
 
     @Override
@@ -54,6 +56,8 @@ public class HasilActivity extends AppCompatActivity {
     public void initUI(){
         tableFase1 = (TableLayout) findViewById(R.id.table_fase1);
         tableFase1.setStretchAllColumns(true);
+
+        fase1Wrapper = (LinearLayout) findViewById(R.id.fase1_wrapper);
     }
 
     private double[][] constraintLeftSide;
@@ -105,9 +109,11 @@ public class HasilActivity extends AppCompatActivity {
     }
 
     public void count(){
+        tableFase1.removeAllViews();
+
         Simplex.Modeler model = new Simplex.Modeler(constraintLeftSide, constraintRightSide,constraintOperator, objectiveFunction);
 
-        Simplex simplex = new Simplex(model.getTableaux(),model.getNumberOfConstraint(),model.getNumberOfOriginalVariable(), MAXIMIZE,tableFase1);
+        Simplex simplex = new Simplex(model.getTableaux(),model.getNumberOfConstraint(),model.getNumberOfOriginalVariable(), MAXIMIZE, fase1Wrapper, getApplicationContext());
         double[] x = simplex.primal();
         for (int i = 0; i < x.length; i++){
 
