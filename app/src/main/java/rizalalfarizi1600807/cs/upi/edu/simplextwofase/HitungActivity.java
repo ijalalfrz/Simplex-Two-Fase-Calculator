@@ -246,7 +246,7 @@ public class HitungActivity extends AppCompatActivity implements View.OnClickLis
         wrapper.option = calc.option;
 
         if(err){
-            Toast.makeText(this,"Konstanta harus diisi 0 jika tidak akan dipakai",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Koefisien dan konstanta harus diisi 0 jika tidak akan dipakai",Toast.LENGTH_SHORT).show();
         }else{
             Intent intent = new Intent(this,HasilActivity.class);
             intent.putExtra(HasilActivity.EXTRA_BAHAN,wrapper);

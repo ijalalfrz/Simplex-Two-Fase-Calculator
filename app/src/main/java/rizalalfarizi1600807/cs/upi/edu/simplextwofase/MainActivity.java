@@ -1,10 +1,13 @@
 package rizalalfarizi1600807.cs.upi.edu.simplextwofase;
 
+import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private RiwayatFragment riwayatFragment;
     private TentangFragment tentangFragment;
+    private int history=R.id.nav_home;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onNavItemClick(){
+
         setFragment(homeFragment);
         mBottomNav.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -52,13 +57,41 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (menuItem.getItemId()){
                     case R.id.nav_home:
+                        history = R.id.nav_home;
                         setFragment(homeFragment);
                         return true;
-                    case R.id.nav_riwayat:
-                        setFragment(riwayatFragment);
-                        return true;
                     case R.id.nav_tentang:
+                        history = R.id.nav_tentang;
                         setFragment(tentangFragment);
+                        return true;
+                    case R.id.nav_keluar:
+                        final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                        alertDialog.setTitle("Perhatian");
+                        alertDialog.setMessage("Apakah anda ingin keluar dari aplikasi?");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        finish();
+                                    }
+                                });
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "TIDAK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        alertDialog.dismiss();
+                                        mBottomNav.setSelectedItemId(history);
+                                    }
+                                });
+                        alertDialog.setOnShowListener( new DialogInterface.OnShowListener() {
+                            @Override
+                            public void onShow(DialogInterface arg0) {
+                                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#627894"));
+                                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setTextColor(Color.parseColor("#627894"));
+
+                            }
+                        });
+
+                        alertDialog.setCancelable(false);
+                        alertDialog.show();
                         return true;
 
                         default:

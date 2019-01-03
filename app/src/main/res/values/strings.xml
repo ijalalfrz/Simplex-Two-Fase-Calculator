@@ -1,9 +1,22 @@
 <resources>
-    <string name="app_name">SimplexTwoFase</string>
+    <string name="app_name">2 Phase Simplex Solver</string>
     <string name="nav_home">Home</string>
     <string name="nav_riwayat">Riwayat</string>
     <string name="nav_tentang">Tentang</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Keluar" />
+    <string name="nav_keluar">Keluar</string>
+
+    <string name="simplex">
+        Merupakan teknik pemecahan masalah simplex dengan 2 step, dalam metode ini konstanta M dihilangkan dengan cara menyelesaikan persoalan dalam dua fase (dua tingkatan) sebagai berikut
+    </string>
+    <string name="simplex_fase1">
+        Bertujuan untuk menguji apakah persoalan yang kita, hadapi memiliki solusi fisibel atau tidak. Pada fase ini fungsi tujuan semula diganti dengan meminimumkan jumlah variabel artifisialnya. Jika nilai minimum fungsi tujuan baru ini berharga nol (artinya seluruh variabel artifisial berharga nol), berarti persoalan memiliki solusi fisibel, lanjutkan ke fase 2.
+    </string>
+    <string name="simplex_fase2">
+        Gunakan solusi basis optimum dari fase 1 sebagai solusi awal bagi persoalan semula. Dalam hal ini ubahlah bentuk fungsi tujuan fase 1 dengan mengembalikannya pada fungsi tujuan persoalan semula. Pemecahan persoalan dilakukan dengan cara seperti biasa.
+
+    </string>
 </resources>

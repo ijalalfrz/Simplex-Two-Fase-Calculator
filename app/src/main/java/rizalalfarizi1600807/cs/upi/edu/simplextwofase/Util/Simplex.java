@@ -5,20 +5,23 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.design.widget.TabLayout;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import rizalalfarizi1600807.cs.upi.edu.simplextwofase.HitungActivity;
 
 public class Simplex {
 
     private double[][] tableaux; // tableaux
+    private double[][] lastTable; // tableaux
+
     private int numberOfConstraints; // number of constraints
     private int numberOfOriginalVariables; // number of original variables
 
@@ -29,6 +32,7 @@ public class Simplex {
     private Context ctx;
     private LinearLayout wrapper;
     private int fase;
+    private int counterFase =0;
 
     private int[] basis; // basis[i] = basic variable corresponding to row i
 
@@ -37,6 +41,8 @@ public class Simplex {
         this.numberOfConstraints = numberOfConstraint;
         this.numberOfOriginalVariables = numberOfOriginalVariable;
         this.tableaux = tableaux;
+        this.lastTable = new double[numberOfConstraints + 1][numberOfOriginalVariables + numberOfConstraints + 1];
+
 
         basis = new int[numberOfConstraints];
         for (int i = 0; i < numberOfConstraints; i++)
@@ -44,8 +50,17 @@ public class Simplex {
         this.ctx = ctx;
         this.wrapper = wrapper;
         this.fase = fase;
+        counterFase = 0;
         solve();
 
+    }
+
+    public double[][] getTableaux() {
+        return tableaux;
+    }
+
+    public double[][] getLastTable() {
+        return lastTable;
     }
 
     // run simplex algorithm starting from initial BFS
@@ -65,8 +80,11 @@ public class Simplex {
 
             // find leaving row p
             int p = minRatioRule(q);
-            if (p == -1)
-                throw new ArithmeticException("Linear program is unbounded");
+            if (p == -1){
+
+                Toast.makeText(ctx,"Solusi tidak terbatas",Toast.LENGTH_SHORT).show();
+//                throw new ArithmeticException("Linear program is unbounded");
+            }
 
             // pivot
             pivot(p, q);
@@ -111,9 +129,7 @@ public class Simplex {
                 continue;
             else if (p == -1)
                 p = i;
-            else if ((tableaux[i][numberOfConstraints
-                    + numberOfOriginalVariables] / tableaux[i][q]) < (tableaux[p][numberOfConstraints
-                    + numberOfOriginalVariables] / tableaux[p][q]))
+            else if ((tableaux[i][numberOfConstraints + numberOfOriginalVariables] / tableaux[i][q]) < (tableaux[p][numberOfConstraints + numberOfOriginalVariables] / tableaux[p][q]))
                 p = i;
         }
         return p;
@@ -176,11 +192,13 @@ public class Simplex {
         TableRow trHead = new TableRow(ctx);
         trHead.setPadding(0,0,0,0);
         trHead.setLayoutParams(trParams);
-        for (int i = 1; i <= numberOfOriginalVariables; i++){
+        for (int i = 0; i <= numberOfOriginalVariables; i++){
             TextView th = new TextView(ctx);
+            if(i>0){
+                th.setText("x"+i);
+            }
             th.setTypeface(Typeface.DEFAULT_BOLD);
             th.setTextColor(Color.rgb(0,0,0));
-            th.setText("x"+i);
             th.setGravity(Gravity.CENTER);
             trHead.addView(th);
         }
@@ -204,8 +222,30 @@ public class Simplex {
         trHead.setLayoutParams(trParams);
         table.addView(trHead);
 
+        ArrayList<Boolean> valOfVar = new ArrayList<>();
+        boolean isFinishedfase1=false;
+        for(int i=0;i<numberOfOriginalVariables;i++){
+            double val = tableaux[numberOfConstraints][i];
+            if(fase==1 && val==0){
+                isFinishedfase1=true;
+            }else if(fase==1 && val!=0){
+                isFinishedfase1=false;
+            }
+            valOfVar.add(isFinishedfase1);
+        }
 
-        if(tableaux[numberOfConstraints][numberOfConstraints + numberOfOriginalVariables]<0&&fase==1){
+
+        isFinishedfase1 = true;
+        for (boolean e: valOfVar) {
+            if(!e){
+                isFinishedfase1 = false;
+            }
+        }
+        if(isFinishedfase1){
+            counterFase++;
+        }
+
+        if(counterFase >1 && fase==1){
             return;
         }
         for (int i = 0; i <= numberOfConstraints; i++) {
@@ -213,15 +253,33 @@ public class Simplex {
             tr.setPadding(0,0,0,0);
             tr.setLayoutParams(trParams);
 
-            for (int j = 0; j <= numberOfConstraints + numberOfOriginalVariables; j++) {
-                System.out.printf("%7.2f ", tableaux[i][j]);
-                TextView tv = new TextView(ctx);
-                tv.setText(String.format("%7.2f",tableaux[i][j]));
-                tv.setTextColor(Color.rgb(0,0,0));
-                tr.addView(tv);
+            for (int j = -1; j <= numberOfConstraints + numberOfOriginalVariables; j++) {
+                if(j==-1){
+                    TextView tv = new TextView(ctx);
+                    tv.setTypeface(Typeface.DEFAULT_BOLD);
+                    tv.setTextColor(Color.rgb(0,0,0));
+                    tv.setGravity(Gravity.CENTER);
+
+                    if(i==numberOfConstraints){
+                        if(fase==1){
+
+                            tv.setText("r");
+                        }else{
+                            tv.setText("z");
+                        }
+                    }
+
+                    tr.addView(tv);
+                }else{
+
+                    lastTable[i][j] = tableaux[i][j];
+                    TextView tv = new TextView(ctx);
+                    tv.setText(String.format("%7.2f",tableaux[i][j]));
+                    tv.setTextColor(Color.rgb(0,0,0));
+                    tr.addView(tv);
+                }
             }
             table.addView(tr, trParams);
-            System.out.println();
         }
 
         wrapper.addView(table);
